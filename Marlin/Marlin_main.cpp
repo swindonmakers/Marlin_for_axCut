@@ -578,24 +578,6 @@ void loop()
   lcd_update();
 }
 
-//CRC-8 - based on the CRC8 formulas by Dallas/Maxim
-//code released under the therms of the GNU GPL 3.0 license
-byte CRC8(const byte *data, byte len) {
-  byte crc = 0x00;
-  while (len--) {
-    byte extract = *data++;
-    for (byte tempI = 8; tempI; tempI--) {
-      byte sum = (crc ^ extract) & 0x01;
-      crc >>= 1;
-      if (sum) {
-        crc ^= 0x8C;
-      }
-      extract >>= 1;
-    }
-  }
-  return crc;
-}
-
 void get_command()
 {
   while( MYSERIAL.available() > 0  && buflen < BUFSIZE) {
@@ -631,8 +613,7 @@ void get_command()
           {
             unsigned short checksum = 0;
             byte count = 0;
-            // replace old XOR-based checksum with CRC8
-            //while(cmdbuffer[bufindw][count] != '*') checksum = checksum^cmdbuffer[bufindw][count++];
+            // replace old XOR-based checksum with CRC16
             while(cmdbuffer[bufindw][count] != '*') count++;
             checksum = CRC16((unsigned char*)&cmdbuffer[bufindw], count);
             strchr_pointer = strchr(cmdbuffer[bufindw], '*');
