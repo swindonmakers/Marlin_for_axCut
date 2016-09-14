@@ -260,10 +260,13 @@
 #define WATERCOOLING_OUTLET_TEMP_PIN 15   // Temp 2 on RAMPS 1.4
 #define WATERCOOLING_OUTLET_TEMP_SENSOR 1
 
+// to turn pump on off
 #define WATERCOOLING_PUMP_PIN 9   // D9 on RAMPS 1.4
 
+// PWM control over water cooling radiator fans
 #define WATERCOOLING_RADFANS_PIN 10  // D10 on RAMPS 1.4
 
+// monitor water flow using hall effect output from the pump, etc
 #define WATERCOOLING_FLOW_SENSOR_PIN 3  // X-Min on RAMPS 1.4
 #define WATERCOOLING_FLOW_SENSOR_INTERRUPT 1
 
