@@ -2423,11 +2423,13 @@ void process_commands()
 	  SERIAL_ECHOLN(isLaserOn());
 	  break;
 	case 669:  // M669 - arm laser
+      st_synchronize();
 	  armLaser();
 	  SERIAL_ECHO_START;
       SERIAL_ECHOLN("Laser armed!");
 	  break;
 	case 670:  // M670 - disarm laser
+      st_synchronize();
 	  disarmLaser();
 	  SERIAL_ECHO_START;
       SERIAL_ECHOLN("Laser disarmed");
