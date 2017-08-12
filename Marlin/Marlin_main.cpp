@@ -2435,6 +2435,7 @@ void process_commands()
       SERIAL_ECHOLN("Laser disarmed");
 	  break;
 	case 671:  // M671 - test fire, S parameter sets laser power as percentage (0-100), P parameter sets duration in milliseconds
+      st_synchronize();
 	  if (isLaserArmed()) {
 		  codenum = 0;
 		  if(code_seen('P')) codenum = code_value(); // milliseconds to wait
@@ -2448,7 +2449,6 @@ void process_commands()
 		  SERIAL_ECHOLN("ms");
 
 		  if (codenum > 0) {
-			  st_synchronize();
 			  codenum += millis();  // keep track of when we started waiting
 			  previous_millis_cmd = millis();
 			  turnLaserOn();
