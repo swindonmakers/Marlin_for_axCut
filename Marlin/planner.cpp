@@ -599,10 +599,7 @@ void plan_buffer_line(const float &x, const float &y, const float &z, const floa
   //enable active axes
   if(block->steps_x != 0) enable_x();
   if(block->steps_y != 0) enable_y();
-
-#ifndef Z_LATE_ENABLE
   if(block->steps_z != 0) enable_z();
-#endif
 
   // Enable all
   if(block->steps_e != 0)

@@ -69,23 +69,23 @@
 // 23,25,27,29 to 43,45,47,32
 
     // special Z driver connections for each of the four corner motors:
-    #define Z_DIR_PIN          33
-    #define Z_ENABLE_PIN       31
+    #define Z_DIR_PIN          17
+    #define Z_ENABLE_PIN       16
 
-    #define Z_STEP_TL_PIN      43
-    #define Z_STEP_BL_PIN      45
-    #define Z_STEP_BR_PIN      47
-    #define Z_STEP_TR_PIN      32
+    #define Z_STEP_TL_PIN      23
+    #define Z_STEP_BL_PIN      25
+    #define Z_STEP_BR_PIN      27
+    #define Z_STEP_TR_PIN      29
 
-    #define Z_MAX_PIN          41 // used for default limit checking
-    #define Z_MAX_TL_PIN       35
-    #define Z_MAX_BL_PIN       37
-    #define Z_MAX_BR_PIN       39
-    #define Z_MAX_TR_PIN       41
+    #define Z_MAX_PIN          47 // TR used for default limit checking
+    #define Z_MAX_TL_PIN       41
+    #define Z_MAX_BL_PIN       43
+    #define Z_MAX_BR_PIN       45
+    #define Z_MAX_TR_PIN       47
 
-    #define Z2_STEP_PIN        36
-    #define Z2_DIR_PIN         34
-    #define Z2_ENABLE_PIN      30
+    //#define Z2_STEP_PIN        36
+    //#define Z2_DIR_PIN         34
+    //#define Z2_ENABLE_PIN      30
 
     #define E0_STEP_PIN        26
     #define E0_DIR_PIN         28

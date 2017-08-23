@@ -153,6 +153,21 @@ FORCE_INLINE block_t *plan_get_current_block()
   return(block);
 }
 
+// Gets the last block. Returns NULL if buffer empty
+FORCE_INLINE block_t *plan_get_last_block()
+{
+  if (block_buffer_head == block_buffer_tail) {
+    return(NULL);
+  }
+  int8_t i = block_buffer_head;
+  if (i == 0) {
+    i = BLOCK_BUFFER_SIZE;
+  }
+  i--;
+  block_t *block = &block_buffer[i];
+  return(block);
+}
+
 // Gets the current block. Returns NULL if buffer empty
 FORCE_INLINE bool blocks_queued()
 {

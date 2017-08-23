@@ -39,7 +39,7 @@
 //=============================public variables  ============================
 //===========================================================================
 block_t *current_block;  // A pointer to the block currently being traced
-
+int8_t z_mode = 0;  // 0 = all z drivers active, 1-4 = single drive active, clockwise from TR
 
 //===========================================================================
 //=============================private variables ============================
@@ -482,6 +482,7 @@ ISR(TIMER1_COMPA_vect)
       }
     }
 
+    // Z axis direction
     if ((out_bits & (1<<Z_AXIS)) != 0) {   // -direction
       WRITE(Z_DIR_PIN,INVERT_Z_DIR);
 
@@ -514,6 +515,7 @@ ISR(TIMER1_COMPA_vect)
       CHECK_ENDSTOPS
       {
         #if defined(Z_MAX_PIN) && Z_MAX_PIN > -1
+            // TODO: check the correct limit switch here!
           bool z_max_endstop=(READ(Z_MAX_PIN) != Z_MAX_ENDSTOP_INVERTING);
           if(z_max_endstop && old_z_max_endstop && (current_block->steps_z > 0)) {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
@@ -542,19 +544,6 @@ ISR(TIMER1_COMPA_vect)
       #ifndef AT90USB
       MSerial.checkRx(); // Check for serial chars.
       #endif
-
-      #ifdef ADVANCE
-      counter_e += current_block->steps_e;
-      if (counter_e > 0) {
-        counter_e -= current_block->step_event_count;
-        if ((out_bits & (1<<E_AXIS)) != 0) { // - direction
-          e_steps[current_block->active_extruder]--;
-        }
-        else {
-          e_steps[current_block->active_extruder]++;
-        }
-      }
-      #endif //ADVANCE
 
         counter_x += current_block->steps_x;
         if (counter_x > 0) {
@@ -615,19 +604,18 @@ ISR(TIMER1_COMPA_vect)
 
       counter_z += current_block->steps_z;
       if (counter_z > 0) {
-        WRITE(Z_STEP_PIN, !INVERT_Z_STEP_PIN);
-
-        #ifdef Z_DUAL_STEPPER_DRIVERS
-          WRITE(Z2_STEP_PIN, !INVERT_Z_STEP_PIN);
-        #endif
+        // TODO: Step all active Z drivers
+        WRITE(Z_STEP_TR_PIN, !INVERT_Z_STEP_PIN);
+        WRITE(Z_STEP_BR_PIN, !INVERT_Z_STEP_PIN);
+        WRITE(Z_STEP_BL_PIN, !INVERT_Z_STEP_PIN);
+        WRITE(Z_STEP_TL_PIN, !INVERT_Z_STEP_PIN);
 
         counter_z -= current_block->step_event_count;
         count_position[Z_AXIS]+=count_direction[Z_AXIS];
-        WRITE(Z_STEP_PIN, INVERT_Z_STEP_PIN);
-
-        #ifdef Z_DUAL_STEPPER_DRIVERS
-          WRITE(Z2_STEP_PIN, INVERT_Z_STEP_PIN);
-        #endif
+        WRITE(Z_STEP_TR_PIN, INVERT_Z_STEP_PIN);
+        WRITE(Z_STEP_BR_PIN, INVERT_Z_STEP_PIN);
+        WRITE(Z_STEP_BL_PIN, INVERT_Z_STEP_PIN);
+        WRITE(Z_STEP_TL_PIN, INVERT_Z_STEP_PIN);
       }
 
       #ifndef ADVANCE
@@ -834,11 +822,6 @@ void st_init()
   #if defined(Z_ENABLE_PIN) && Z_ENABLE_PIN > -1
     SET_OUTPUT(Z_ENABLE_PIN);
     if(!Z_ENABLE_ON) WRITE(Z_ENABLE_PIN,HIGH);
-
-    #if defined(Z_DUAL_STEPPER_DRIVERS) && defined(Z2_ENABLE_PIN) && (Z2_ENABLE_PIN > -1)
-      SET_OUTPUT(Z2_ENABLE_PIN);
-      if(!Z_ENABLE_ON) WRITE(Z2_ENABLE_PIN,HIGH);
-    #endif
   #endif
   #if defined(E0_ENABLE_PIN) && (E0_ENABLE_PIN > -1)
     SET_OUTPUT(E0_ENABLE_PIN);
@@ -892,8 +875,16 @@ void st_init()
 
   #if defined(Z_MAX_PIN) && Z_MAX_PIN > -1
     SET_INPUT(Z_MAX_PIN);
+    SET_INPUT(Z_MAX_TL_PIN);
+    SET_INPUT(Z_MAX_TR_PIN);
+    SET_INPUT(Z_MAX_BL_PIN);
+    SET_INPUT(Z_MAX_BR_PIN);
     #ifdef ENDSTOPPULLUP_ZMAX
       WRITE(Z_MAX_PIN,HIGH);
+      WRITE(Z_MAX_TL_PIN,HIGH);
+      WRITE(Z_MAX_TR_PIN,HIGH);
+      WRITE(Z_MAX_BL_PIN,HIGH);
+      WRITE(Z_MAX_BR_PIN,HIGH);
     #endif
   #endif
 
@@ -926,7 +917,14 @@ void st_init()
   #endif
   #if defined(Z_STEP_PIN) && (Z_STEP_PIN > -1)
     SET_OUTPUT(Z_STEP_PIN);
-    WRITE(Z_STEP_PIN,INVERT_Z_STEP_PIN);
+    SET_OUTPUT(Z_STEP_TL_PIN);
+    SET_OUTPUT(Z_STEP_TR_PIN);
+    SET_OUTPUT(Z_STEP_BL_PIN);
+    SET_OUTPUT(Z_STEP_BR_PIN);
+    WRITE(Z_STEP_TL_PIN,INVERT_Z_STEP_PIN);
+    WRITE(Z_STEP_TR_PIN,INVERT_Z_STEP_PIN);
+    WRITE(Z_STEP_BL_PIN,INVERT_Z_STEP_PIN);
+    WRITE(Z_STEP_BR_PIN,INVERT_Z_STEP_PIN);
     #if defined(Z_DUAL_STEPPER_DRIVERS) && defined(Z2_STEP_PIN) && (Z2_STEP_PIN > -1)
       SET_OUTPUT(Z2_STEP_PIN);
       WRITE(Z2_STEP_PIN,INVERT_Z_STEP_PIN);
